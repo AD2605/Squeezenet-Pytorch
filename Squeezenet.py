@@ -90,17 +90,19 @@ class SqueezeNet(nn.Module):
             train_accuracy = 0
             net_loss = 0
             for _, (x, y) in enumerate(data):
+                optimizer.zero_grad()
                 x = x.cuda()
                 y = y.cuda()
                 out = model(x)
                 loss = criterion(out, y)
                 loss.backward()
                 optimizer.step()
-                scheduler.step()
                 max_index = out.max(dim=1)[1]
                 accuracy = (max_index==y).sum()
                 train_accuracy += accuracy.item()
                 net_loss+=loss.item()
+
+            scheduler.step()
             print('---------------------------------------------------------')
             print(epoch)
             print('AVERAGE LOSS = ', net_loss/len(data))
